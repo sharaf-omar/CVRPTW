@@ -18,10 +18,10 @@ Every section of the project uses these symbols. Please do not rename them local
 | Symbol | Domain | Meaning |
 |---|---|---|
 | $n$ | $\mathbb{N}$ | Number of customers |
-| $m$ | $\mathbb{N}$ | Maximum number of vehicles |
+| $m$ | $\mathbb{N}$ | Maximum number of vehicles (hard bound) |
 | $Q$ | $\mathbb{N}$ | Vehicle capacity (identical vehicles) |
 | $q_i$ | $1\le q_i\le Q$; $q_0=q_{n+1}=0$ | Demand of customer $i$ |
-| $a_i$, $b_i$ | $a_i\le b_i$ | Earliest and latest permitted **start of service** at $i$ |
+| $a_i$, $b_i$ | $a_i\le b_i$ | Earliest and latest permitted **start of service** at $i$. Depot: $a_0=a_{n+1}=0$, $b_0=b_{n+1}=H$ |
 | $d_i$ | $\ge0$; $d_0=d_{n+1}=0$ | Service duration at $i$ |
 | $H$ | $>0$ | End of the planning horizon; depot window is $[0,H]$ |
 | $P$, $\theta_p$ | $\theta_0=0<\dots<\theta_P=H$ | Number of slots and slot boundaries |
@@ -40,9 +40,9 @@ $P=3$. Slot 1 and slot 3 are off-peak ($\rho_1=\rho_3=1$). Slot 2 is the peak ($
 | Symbol | Domain | Meaning |
 |---|---|---|
 | $x_{ij}$ | $\{0,1\}$ | 1 if some vehicle drives directly from $i$ to $j$ |
-| $z_{ij}^p$ | $\{0,1\}$ | 1 if arc $(i,j)$ is used and the vehicle leaves $i$ in slot $p$ |
-| $s_i$ | $[a_i,b_i]$, $s_0=0$ | Start-of-service time at $i$ ($s_{n+1}$: return time) |
-| $\delta_i$ | $[0,H]$, $\delta_0=0$ | Departure time from $i$ (idling after service is allowed) |
+| $z_{ij}^p$ | $\{0,1\}$ | 1 if arc $(i,j)$ is used and the vehicle leaves $i$ in slot $p$. For $i=0$ only $p=1$ can be 1, so $z_{0j}^p$ with $p\ge2$ may be dropped in an implementation |
+| $s_i$ | $[a_i,b_i]$, $i\in N\cup\{n+1\}$ | Start-of-service time at $i$ ($s_{n+1}$: return time). $s_0=0$ is only a starting convention for the evaluation rule, not an ILP variable |
+| $\delta_i$ | $[0,H]$, $i\in N$ | Departure time from $i$ (idling after service is allowed). $\delta_0=0$ is a constant |
 | $u_i$ | $[q_i,Q]$ | Cumulative demand delivered on the route up to and including $i$ |
 
 ## Derived quantities
@@ -72,12 +72,18 @@ Feasible if every $s_j\le b_j$, $s_{n+1}\le H$, and the load is at most $Q$. Sta
 * Single depot, identical vehicles, one visit per customer, no split delivery.
 * The heuristic's solution is a list of routes. Start times are recomputed from the routes by the evaluation rule.
 
-## Open decisions (to settle with the team)
+## Decisions
 
-1. Objective: free-flow cost (default) or experienced travel time $\sum t_{ij}^pz_{ij}^p$?
-2. Is $m$ a hard bound, or is the number of vehicles minimized first (fixed cost $f$)?
-3. Peak parameters: $\theta_1,\theta_2,\rho$, and how they are generated for benchmark instances.
-4. Distance rounding, and instance storage format (shared with Section 3).
+Settled:
+
+1. Objective: free-flow cost $\sum c_{ij}x_{ij}$. Experienced travel time $\sum t_{ij}^pz_{ij}^p$ is not used.
+2. $m$ is a hard bound. The number of vehicles is not penalised in the objective.
+3. Distances are rounded as the benchmark prescribes (part of decision 4).
+
+Still open:
+
+1. Peak parameters: $\theta_1,\theta_2,\rho$, and how they are generated for benchmark instances.
+2. Instance storage format (shared with Section 3).
 
 ## Translation from the first version of the code and notebook
 
