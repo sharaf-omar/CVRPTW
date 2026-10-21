@@ -83,4 +83,3 @@ The starting solution comes from the **Clarke-Wright savings** algorithm.
    
    They will be tuned in the final deliverable.
 6. **Fast evaluation with traffic:** the classic O(1) feasibility checks based on forward time slack (Savelsbergh) do not apply directly when travel times depend on the time slot. The proposed workaround is to recompute only the end of the modified route, and to stop as soon as the start times no longer change.
-7. **Writing:** who writes Section 6?
